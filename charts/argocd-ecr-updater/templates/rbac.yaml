@@ -1,0 +1,39 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: argocd-ecr-updater
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: argocd-ecr-updater
+rules:
+  # Patch/update existing repo-creds secrets (CronJob refresh) — scoped
+  # to exactly the Secret names derived from .Values.registries, the
+  # same list the CronJob passes via --secrets.
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames:
+      {{- range .Values.registries }}
+      - {{ .secret }}
+      {{- end }}
+    verbs: ["get", "list", "patch", "update"]
+  # Create new secrets (PostSync hook seed — secrets may not exist yet;
+  # create cannot be scoped by resourceNames in RBAC).
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: argocd-ecr-updater
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: argocd-ecr-updater
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: argocd-ecr-updater
+subjects:
+  - kind: ServiceAccount
+    name: argocd-ecr-updater
+    namespace: {{ .Release.Namespace }}

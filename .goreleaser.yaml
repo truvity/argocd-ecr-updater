@@ -1,0 +1,52 @@
+project_name: argocd-ecr-updater
+
+version: 2
+
+builds:
+  - id: updater
+    main: ./cmd/updater
+    binary: ecr-updater
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w -X main.Version={{.Version}} -X main.GitCommit={{.FullCommit}}
+
+archives:
+  - id: binary
+    ids:
+      - updater
+    formats: [tar.gz]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+kos:
+  - id: updater
+    build: updater
+    tags:
+      - "{{ .Version }}"
+      - "{{ if not .IsSnapshot }}latest{{ end }}"
+    platforms:
+      - linux/amd64
+      - linux/arm64
+    bare: true
+    preserve_import_paths: false
+    base_import_paths: true
+    base_image: gcr.io/distroless/static:nonroot
+    sbom: none
+    labels:
+      org.opencontainers.image.title: updater
+      org.opencontainers.image.version: "{{ .Version }}"
+      org.opencontainers.image.source: https://github.com/truvity/argocd-ecr-updater
+
+release:
+  github:
+    owner: truvity
+    name: argocd-ecr-updater
+
+changelog:
+  use: github-native

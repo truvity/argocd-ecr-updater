@@ -1,0 +1,39 @@
+# argocd-ecr-updater: refreshes ECR tokens for ArgoCD repo-creds
+# Secrets. The CronJob refreshes on a schedule; a PostSync hook seeds
+# each missing Secret on first deploy (ECR tokens live 12h; ArgoCD has
+# no native refresher).
+
+image:
+  repository: ghcr.io/truvity/argocd-ecr-updater/updater
+  tag: ""  # defaults to appVersion
+  pullPolicy: IfNotPresent
+
+schedule: "0 */6 * * *"
+
+awsRegion: eu-central-1
+
+# Registries: repo-creds Secret name -> OCI registry URL. The PostSync
+# seed hook creates each missing Secret with its url; the CronJob
+# refreshes tokens (one ECR token authenticates the caller against any
+# registry whose repo policies grant it). The Role's patch rule is
+# scoped to exactly these Secret names.
+registries: []
+# - secret: ecr-repo-creds-stable
+#   url: "oci://<account>.dkr.ecr.<region>.amazonaws.com"
+
+serviceAccount:
+  # Extra ServiceAccount annotations. AWS access is auth-agnostic: wire
+  # an EKS Pod Identity association estate-side, or set an IRSA role
+  # here (eks.amazonaws.com/role-arn: arn:aws:iam::<acct>:role/<name>).
+  # The role needs ecr:GetAuthorizationToken.
+  annotations: {}
+
+# Arch scheduling for the CronJob and seed hook pods. Set to {} on
+# clusters without the arch taint convention.
+nodeSelector:
+  kubernetes.io/arch: arm64
+tolerations:
+  - key: arch
+    value: arm64
+    operator: Equal
+    effect: NoSchedule
