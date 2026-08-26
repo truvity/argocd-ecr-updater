@@ -40,7 +40,8 @@ chart-lint:
     helm lint charts/argocd-ecr-updater
     helm template argocd-ecr-updater charts/argocd-ecr-updater \
         --set image.tag=0.0.0 \
-        --set keysSecretName=example-keys >/dev/null
+        --set 'registries[0].secret=ecr-repo-creds-example' \
+        --set 'registries[0].url=oci://000000000000.dkr.ecr.eu-central-1.amazonaws.com' >/dev/null
     ! helm template argocd-ecr-updater charts/argocd-ecr-updater --set bogusKey=1 >/dev/null 2>&1
 
 check: build test lint chart-lint vuln
