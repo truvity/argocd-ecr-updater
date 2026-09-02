@@ -2,6 +2,8 @@ module github.com/truvity/argocd-ecr-updater
 
 go 1.27.0
 
+toolchain go1.27.1
+
 require (
 	github.com/aws/aws-sdk-go-v2/config v1.32.39
 	github.com/aws/aws-sdk-go-v2/service/ecr v1.60.8
