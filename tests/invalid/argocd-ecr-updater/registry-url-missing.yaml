@@ -1,0 +1,2 @@
+registries:
+  - secret: ecr-repo-creds-example

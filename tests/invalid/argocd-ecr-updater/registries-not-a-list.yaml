@@ -1,0 +1,2 @@
+registries:
+  ecr-repo-creds-example: oci://<account>.dkr.ecr.<region>.amazonaws.com

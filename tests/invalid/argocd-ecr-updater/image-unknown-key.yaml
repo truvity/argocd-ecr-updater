@@ -1,0 +1,4 @@
+# image.version is not a field; the pinned image would run while the
+# values file names another version.
+image:
+  version: 1.2.3

@@ -1,0 +1,155 @@
+---
+# Source: argocd-ecr-updater/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: argocd-ecr-updater
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-ecr-updater
+
+---
+# Source: argocd-ecr-updater/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: argocd-ecr-updater
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-ecr-updater
+rules:
+  # Patch/update existing repo-creds secrets (CronJob refresh) — scoped
+  # to exactly the Secret names derived from .Values.registries, the
+  # same list the CronJob passes via --secrets.
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames:
+      - ecr-repo-creds-example
+    verbs: ["get", "list", "patch", "update"]
+  # Create new secrets (PostSync hook seed — secrets may not exist yet;
+  # create cannot be scoped by resourceNames in RBAC).
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["create"]
+
+---
+# Source: argocd-ecr-updater/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: argocd-ecr-updater
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-ecr-updater
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: argocd-ecr-updater
+subjects:
+  - kind: ServiceAccount
+    name: argocd-ecr-updater
+    namespace: argocd
+
+---
+# Source: argocd-ecr-updater/templates/hook-postsync.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: argocd-ecr-updater-seed
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-ecr-updater
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: argocd-ecr-updater
+    spec:
+      serviceAccountName: argocd-ecr-updater
+      restartPolicy: OnFailure
+      nodeSelector:
+        kubernetes.io/arch: arm64
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: seed-example
+          image: ghcr.io/truvity/argocd-ecr-updater/updater:0.0.0
+          imagePullPolicy: IfNotPresent
+          args:
+            - --region=eu-central-1
+            - --namespace=argocd
+            - --secrets=ecr-repo-creds-example
+            - --registry-url=oci://<account>.dkr.ecr.<region>.amazonaws.com
+            - --seed
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 65534
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+
+---
+# Source: argocd-ecr-updater/templates/cronjob.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: argocd-ecr-updater
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-ecr-updater
+spec:
+  schedule: "0 */6 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  suspend: false
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 3600
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: argocd-ecr-updater
+        spec:
+          nodeSelector:
+            kubernetes.io/arch: arm64
+          serviceAccountName: argocd-ecr-updater
+          restartPolicy: OnFailure
+          terminationGracePeriodSeconds: 30
+          containers:
+            - name: ecr-token-refresh
+              image: ghcr.io/truvity/argocd-ecr-updater/updater:0.0.0
+              imagePullPolicy: IfNotPresent
+              args:
+                - --region=eu-central-1
+                - --namespace=argocd
+                - --secrets=ecr-repo-creds-example
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 64Mi
+                limits:
+                  memory: 128Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+                runAsUser: 65534
+                capabilities:
+                  drop:
+                    - ALL
+                seccompProfile:
+                  type: RuntimeDefault
