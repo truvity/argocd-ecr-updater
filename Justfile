@@ -16,9 +16,23 @@ test:
     go test ./... -coverprofile=coverage.out
 
 
-# Run linters
+# Run linters. `config verify` first: the v2 schema silently accepts a
+# stale settings block that only verify rejects.
 lint:
+    golangci-lint config verify
     golangci-lint run ./...
+
+# The reason this repository can be public. Runs in CI as its own job.
+leak-canary:
+    hack/leak-canary.sh
+
+# Run the tests under the race detector. Not part of `check`, and
+# deliberately: everything else here builds with cgo off, which is what
+# makes the binary static, and the race detector is the one thing that
+# needs a C toolchain. CI runs this as its own job, where the toolchain
+# is the runner's own.
+race:
+    CGO_ENABLED=1 go test -race ./...
 
 # Run Go vulnerability check
 vuln:
@@ -41,10 +55,10 @@ chart-lint:
     helm template argocd-ecr-updater charts/argocd-ecr-updater \
         --set image.tag=0.0.0 \
         --set 'registries[0].secret=ecr-repo-creds-example' \
-        --set 'registries[0].url=oci://000000000000.dkr.ecr.eu-central-1.amazonaws.com' >/dev/null
+        --set 'registries[0].url=oci://<account>.dkr.ecr.<region>.amazonaws.com' >/dev/null
     ! helm template argocd-ecr-updater charts/argocd-ecr-updater --set bogusKey=1 >/dev/null 2>&1
 
-check: build test lint chart-lint vuln
+check: build test lint chart-lint leak-canary vuln
 
 # Build a snapshot release locally (no push, no tag)
 snapshot:

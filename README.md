@@ -38,7 +38,7 @@ Auth-agnostic — the workload uses the SDK default chain and needs only
   ServiceAccount `argocd-ecr-updater` in the release namespace.
 - **IRSA** (plain EKS, or non-EKS clusters via
   [amazon-eks-pod-identity-webhook](https://github.com/truvity/amazon-eks-pod-identity-webhook)):
-  `--set serviceAccount.annotations."eks\.amazonaws\.com/role-arn"=arn:aws:iam::<acct>:role/<name>`
+  `--set serviceAccount.annotations."eks\.amazonaws\.com/role-arn"=<the role's ARN>`
 
 ## Releases
 

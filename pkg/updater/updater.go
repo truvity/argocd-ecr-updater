@@ -1,3 +1,6 @@
+// Package updater obtains one ECR authorization token and writes it into
+// the Argo CD repo-creds Secrets it is given: patching the password of each
+// Secret that exists, and in seed mode creating each one that does not.
 package updater
 
 import (
