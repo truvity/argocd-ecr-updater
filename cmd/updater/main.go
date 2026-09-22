@@ -1,3 +1,6 @@
+// Command ecr-updater refreshes the ECR authorization token held by
+// Argo CD repo-creds Secrets, and in seed mode creates the Secrets that do
+// not exist yet.
 package main
 
 import (
@@ -54,7 +57,7 @@ func run() int {
 			},
 			&cli.StringFlag{
 				Name:  "registry-url",
-				Usage: "ECR registry URL for creating new secrets (e.g., oci://677224894277.dkr.ecr.eu-central-1.amazonaws.com)",
+				Usage: "ECR registry URL for creating new secrets (e.g., oci://<account>.dkr.ecr.<region>.amazonaws.com)",
 			},
 			&cli.BoolFlag{
 				Name:  "seed",

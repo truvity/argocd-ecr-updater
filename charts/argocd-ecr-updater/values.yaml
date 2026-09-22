@@ -24,7 +24,7 @@ registries: []
 serviceAccount:
   # Extra ServiceAccount annotations. AWS access is auth-agnostic: wire
   # an EKS Pod Identity association estate-side, or set an IRSA role
-  # here (eks.amazonaws.com/role-arn: arn:aws:iam::<acct>:role/<name>).
+  # here (eks.amazonaws.com/role-arn: <the role's ARN>).
   # The role needs ecr:GetAuthorizationToken.
   annotations: {}
 
