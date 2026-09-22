@@ -1,0 +1,8 @@
+# A cluster without the arch taint convention: both scheduling blocks
+# cleared, so neither nodeSelector nor tolerations renders on the
+# CronJob or the seed hook. One registry so the hook renders.
+nodeSelector: {}
+tolerations: []
+registries:
+  - secret: ecr-repo-creds-example
+    url: oci://<account>.dkr.ecr.<region>.amazonaws.com

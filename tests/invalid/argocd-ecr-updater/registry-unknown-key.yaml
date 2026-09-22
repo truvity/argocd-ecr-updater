@@ -1,0 +1,4 @@
+registries:
+  - secret: ecr-repo-creds-example
+    url: oci://<account>.dkr.ecr.<region>.amazonaws.com
+    region: eu-example-1

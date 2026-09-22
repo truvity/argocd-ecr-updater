@@ -1,0 +1,23 @@
+# Every value at a neutral non-default: two registries (the seed hook
+# renders one container per registry and the Role lists both Secrets),
+# an explicit image, a custom schedule, an IRSA-style annotation and
+# amd64 scheduling.
+image:
+  repository: registry.example.internal/argocd-ecr-updater/updater
+  tag: 1.2.3
+  pullPolicy: Always
+schedule: "15 * * * *"
+awsRegion: eu-example-1
+registries:
+  - secret: ecr-repo-creds-example
+    url: oci://<account>.dkr.ecr.<region>.amazonaws.com
+  - secret: ecr-repo-creds-second
+    url: oci://<second-account>.dkr.ecr.<region>.amazonaws.com
+serviceAccount:
+  annotations:
+    example.com/role: ecr-reader
+nodeSelector:
+  kubernetes.io/arch: amd64
+tolerations:
+  - key: arch
+    operator: Exists

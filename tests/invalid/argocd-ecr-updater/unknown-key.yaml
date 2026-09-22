@@ -1,0 +1,2 @@
+# A typo must fail the render instead of being silently ignored.
+schedul: "15 * * * *"

@@ -1,0 +1,5 @@
+# Argo CD reads the Secret as a Helm OCI repo-creds entry; a URL without
+# the oci:// scheme would seed a Secret Argo CD cannot use.
+registries:
+  - secret: ecr-repo-creds-example
+    url: https://<account>.dkr.ecr.<region>.amazonaws.com

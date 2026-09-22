@@ -1,5 +1,23 @@
 apiVersion: v2
 name: argocd-ecr-updater
-version: 0.0.0-dev  # set by the release workflow
-description: "ECR token refresher for ArgoCD repo-creds Secrets: hourly CronJob + PostSync seed hook"
-appVersion: 0.0.0-dev  # set by the release workflow
+description: >-
+  ECR token refresher for Argo CD repo-creds Secrets: an hourly-ish
+  CronJob that rewrites each Secret's password, and a PostSync hook that
+  seeds the Secrets a fresh cluster does not have yet.
+type: application
+# Placeholder: the git tag is the sole version authority. The release
+# workflow stamps both fields from the tag (truvity/ci-workflows
+# release-public.yaml).
+version: 0.0.0
+appVersion: 0.0.0
+home: https://github.com/truvity/argocd-ecr-updater
+sources:
+  - https://github.com/truvity/argocd-ecr-updater
+keywords:
+  - argocd
+  - ecr
+  - helm
+  - oci
+maintainers:
+  - name: Truvity
+    url: https://github.com/truvity
