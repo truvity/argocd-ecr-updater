@@ -10,7 +10,9 @@ image:
 
 schedule: "0 */6 * * *"
 
-awsRegion: eu-central-1
+# AWS region where the registries live. No default: every estate provides
+# its own (eu-central-1, eu-west-1, us-east-1, etc).
+awsRegion: "eu-example-1"
 
 # Registries: repo-creds Secret name -> OCI registry URL. The PostSync
 # seed hook creates each missing Secret with its url; the CronJob
@@ -28,12 +30,8 @@ serviceAccount:
   # The role needs ecr:GetAuthorizationToken.
   annotations: {}
 
-# Arch scheduling for the CronJob and seed hook pods. Set to {} on
-# clusters without the arch taint convention.
-nodeSelector:
-  kubernetes.io/arch: arm64
-tolerations:
-  - key: arch
-    value: arm64
-    operator: Equal
-    effect: NoSchedule
+# Arch scheduling for the CronJob and seed hook pods: required estate
+# inputs, no defaults. Set them on clusters with the arch taint convention;
+# set to {} and [] on clusters without it.
+nodeSelector: {}
+tolerations: []

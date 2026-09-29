@@ -71,15 +71,13 @@ spec:
     spec:
       serviceAccountName: argocd-ecr-updater
       restartPolicy: OnFailure
-      nodeSelector:
-        kubernetes.io/arch: arm64
       terminationGracePeriodSeconds: 30
       containers:
         - name: seed-example
           image: ghcr.io/truvity/argocd-ecr-updater/updater:0.0.0
           imagePullPolicy: IfNotPresent
           args:
-            - --region=eu-central-1
+            - --region=eu-example-1
             - --namespace=argocd
             - --secrets=ecr-repo-creds-example
             - --registry-url=oci://<account>.dkr.ecr.<region>.amazonaws.com
@@ -124,8 +122,6 @@ spec:
           labels:
             app.kubernetes.io/name: argocd-ecr-updater
         spec:
-          nodeSelector:
-            kubernetes.io/arch: arm64
           serviceAccountName: argocd-ecr-updater
           restartPolicy: OnFailure
           terminationGracePeriodSeconds: 30
@@ -134,7 +130,7 @@ spec:
               image: ghcr.io/truvity/argocd-ecr-updater/updater:0.0.0
               imagePullPolicy: IfNotPresent
               args:
-                - --region=eu-central-1
+                - --region=eu-example-1
                 - --namespace=argocd
                 - --secrets=ecr-repo-creds-example
               resources:

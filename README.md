@@ -4,17 +4,6 @@ Keeps the ECR credential in Argo CD's repo-creds Secrets fresh: a CronJob
 that rewrites each Secret's password with a new authorization token, and
 a PostSync hook that seeds the Secrets a fresh cluster does not have yet.
 
-| Artifact | What | Where | Status |
-| --- | --- | --- | --- |
-| `charts/argocd-ecr-updater` | the CronJob, the seed hook, the ServiceAccount and a Role scoped to the configured Secrets | `oci://ghcr.io/truvity/charts/argocd-ecr-updater` | shipped |
-| `updater` image | the binary in a distroless image, `linux/amd64` and `linux/arm64` | `ghcr.io/truvity/argocd-ecr-updater/updater` | shipped |
-| `ecr-updater` binary | the same binary as an archive per OS and architecture | the GitHub Release | shipped |
-| `github.com/truvity/argocd-ecr-updater` | the Go module the binary is built from; `pkg/updater` is not a supported API | | not offered |
-
-One tag releases all of them at the same version, and the chart's
-default image tag is its own `appVersion`, so a released chart pulls the
-image built from the same commit.
-
 ## Who it is for
 
 A platform team that runs **Argo CD** on **Kubernetes** and pulls Helm
@@ -76,6 +65,15 @@ PostSync hook, and every later sync refreshes it; between syncs the
 CronJob does. An estate that already has the Secret keeps it: only its
 `password` is rewritten. [docs/reference.md](docs/reference.md) has
 every value and every flag.
+
+## Consumers
+
+- **truvity/gitops**: deploys the chart
+
+## Neighbours
+
+- **ci-plane**: hosts the registry cache; this chart and ci-plane both patch ECR credentials
+- **ocictl**: the other ECR touchpoint in the estate
 
 ## Documentation
 

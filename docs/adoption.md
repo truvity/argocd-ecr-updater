@@ -19,6 +19,31 @@
 - **Egress** from the pods to the ECR and STS endpoints of `awsRegion`,
   or to the node-local credential endpoint, and to the Kubernetes API.
 
+## Truvity-shaped values
+
+The Truvity estate pins pods to arm64 nodes with the arch taint convention.
+An example values file for deployment there:
+
+```yaml
+awsRegion: eu-central-1
+registries:
+  - secret: ecr-repo-creds-stable
+    url: oci://<account>.dkr.ecr.eu-central-1.amazonaws.com
+# Assumes Pod Identity is wired; leave annotations empty
+serviceAccount:
+  annotations: {}
+# Truvity estate pinning
+nodeSelector:
+  kubernetes.io/arch: arm64
+tolerations:
+  - key: arch
+    value: arm64
+    operator: Equal
+    effect: NoSchedule
+```
+
+Substitute your account ID and region, and switch to IRSA if your estate uses it.
+
 ## Install order
 
 1. **The principal.** The IAM role and, for EKS Pod Identity, the
