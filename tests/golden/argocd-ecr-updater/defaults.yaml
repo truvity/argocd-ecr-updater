@@ -24,6 +24,7 @@ rules:
   - apiGroups: [""]
     resources: ["secrets"]
     resourceNames:
+      - ecr-repo-creds
     verbs: ["get", "list", "patch", "update"]
   # Create new secrets (PostSync hook seed — secrets may not exist yet;
   # create cannot be scoped by resourceNames in RBAC).
@@ -50,6 +51,55 @@ subjects:
     namespace: argocd
 
 ---
+# Source: argocd-ecr-updater/templates/hook-postsync.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: argocd-ecr-updater-seed
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-ecr-updater
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: argocd-ecr-updater
+    spec:
+      serviceAccountName: argocd-ecr-updater
+      restartPolicy: OnFailure
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: seed-ecr-repo-creds
+          image: ghcr.io/truvity/argocd-ecr-updater/updater:0.0.0
+          imagePullPolicy: IfNotPresent
+          args:
+            - --region=eu-example-1
+            - --namespace=argocd
+            - --secrets=ecr-repo-creds
+            - --registry-url=oci://<account>.dkr.ecr.<region>.amazonaws.com
+            - --seed
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 65534
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+
+---
 # Source: argocd-ecr-updater/templates/cronjob.yaml
 apiVersion: batch/v1
 kind: CronJob
@@ -72,13 +122,6 @@ spec:
           labels:
             app.kubernetes.io/name: argocd-ecr-updater
         spec:
-          nodeSelector:
-            kubernetes.io/arch: arm64
-          tolerations:
-            - effect: NoSchedule
-              key: arch
-              operator: Equal
-              value: arm64
           serviceAccountName: argocd-ecr-updater
           restartPolicy: OnFailure
           terminationGracePeriodSeconds: 30
@@ -87,9 +130,9 @@ spec:
               image: ghcr.io/truvity/argocd-ecr-updater/updater:0.0.0
               imagePullPolicy: IfNotPresent
               args:
-                - --region=eu-central-1
+                - --region=eu-example-1
                 - --namespace=argocd
-                - --secrets=
+                - --secrets=ecr-repo-creds
               resources:
                 requests:
                   cpu: 10m

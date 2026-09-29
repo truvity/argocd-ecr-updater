@@ -1,1 +1,5 @@
-{}
+# Minimal valid values: only the required fields, no estate-specific inputs
+awsRegion: eu-example-1
+registries:
+  - secret: ecr-repo-creds
+    url: oci://<account>.dkr.ecr.<region>.amazonaws.com

@@ -1,6 +1,7 @@
 # A cluster without the arch taint convention: both scheduling blocks
 # cleared, so neither nodeSelector nor tolerations renders on the
 # CronJob or the seed hook. One registry so the hook renders.
+awsRegion: eu-example-1
 nodeSelector: {}
 tolerations: []
 registries:
