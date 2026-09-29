@@ -72,8 +72,9 @@ every value and every flag.
 
 ## Neighbours
 
-- **ci-plane**: hosts the registry cache; this chart and ci-plane both patch ECR credentials
-- **ocictl**: the other ECR touchpoint in the estate
+- **ocictl**: the other ECR touchpoint in the estate — it authenticates to
+  ECR to push charts and images; this chart refreshes the ECR pull
+  credential Argo CD reads
 
 ## Documentation
 
