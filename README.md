@@ -54,8 +54,8 @@ registries:
 serviceAccount:
   annotations:
     eks.amazonaws.com/role-arn: <the role's ARN>
-# The defaults pin the pods to arm64 nodes; clear both on a cluster
-# without that convention.
+# Required estate inputs, no chart default: set them on clusters with
+# an arch taint convention, leave both {} and [] on ones without it.
 nodeSelector: {}
 tolerations: []
 ```
