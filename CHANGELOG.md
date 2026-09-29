@@ -5,6 +5,12 @@ heading here is a patch cut automatically for dependency bumps alone; its
 GitHub Release lists them. The chart and the image are released together
 at every version.
 
+## v2.0.0
+
+- **Breaking:** `awsRegion` is now required and has no default; `nodeSelector` defaults to `{}` and `tolerations` to `[]`. Consumers that relied on the previous estate-shaped defaults (`eu-central-1`, the `arm64` nodeSelector, the `arch` toleration) must set them explicitly; `docs/adoption.md` shows the values block.
+- Removed the orphaned `setup-zcbctl` composite action; no workflow used it.
+- README gains `Consumers` and `Neighbours`; ci-workflows pins moved to v3.13.1.
+
 ## v1.0.1
 
 - **`values.schema.json`: an unknown key fails the render.** Strict at
