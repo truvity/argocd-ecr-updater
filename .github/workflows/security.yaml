@@ -21,6 +21,6 @@ jobs:
   # would otherwise wedge every pull request on a finding nobody can act
   # on, which is exactly what happened to pulumi-zitadel.
   govulncheck:
-    uses: truvity/ci-workflows/.github/workflows/check.yaml@8f3784ed52a6a787479ef316e4d6f933ac0a4b8c # v3.14.0
+    uses: truvity/ci-workflows/.github/workflows/check.yaml@4b73b729776c178971bc1843b5dae88c208ddb08 # v3.14.2
     with:
       recipes: '["vuln"]'
