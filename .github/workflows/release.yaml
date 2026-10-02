@@ -35,7 +35,7 @@ jobs:
     permissions:
       contents: write
       packages: write
-    uses: truvity/ci-workflows/.github/workflows/release-public.yaml@83a33664e82b4df3764ed4b4544707320b51db92 # v3.13.1
+    uses: truvity/ci-workflows/.github/workflows/release-public.yaml@8f3784ed52a6a787479ef316e4d6f933ac0a4b8c # v3.14.0
     with:
       charts: '["argocd-ecr-updater"]'
       # Nest the image under the repo namespace (INF-587 / INF-584 N1):
