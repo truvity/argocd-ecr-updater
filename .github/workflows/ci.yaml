@@ -25,7 +25,7 @@ concurrency:
 
 jobs:
   recipes:
-    uses: truvity/ci-workflows/.github/workflows/check.yaml@a523f2f6e5868b00362056569c667243631fd90f # v3.26.2
+    uses: truvity/ci-workflows/.github/workflows/check.yaml@43cffb6f220a3efa7de1cf5c79232cf21117e365 # v3.26.4
     with:
       recipes: '["build","lint","test","leak-canary"]'
 
@@ -34,7 +34,7 @@ jobs:
   # static. Putting it in `check` would mean every contributor needs one
   # to run the gate at all.
   race:
-    uses: truvity/ci-workflows/.github/workflows/check.yaml@a523f2f6e5868b00362056569c667243631fd90f # v3.26.2
+    uses: truvity/ci-workflows/.github/workflows/check.yaml@43cffb6f220a3efa7de1cf5c79232cf21117e365 # v3.26.4
     with:
       recipes: '["race"]'
 
