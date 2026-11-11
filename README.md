@@ -66,9 +66,22 @@ CronJob does. An estate that already has the Secret keeps it: only its
 `password` is rewritten. [docs/reference.md](docs/reference.md) has
 every value and every flag.
 
+## Platform part and company part
+
+**Platform part.** The platform admin applies the chart (the CronJob, the
+PostSync seed hook, the ServiceAccount and the Role) into the Argo CD
+namespace of each cluster that pulls charts from ECR, with the
+`registries`, `awsRegion` and scheduling values. The chart creates neither
+the IAM role nor the repository policies; see
+[docs/adoption.md](docs/adoption.md).
+
+**Company part.** None. A company's Argo CD Applications whose chart source
+matches a configured registry URL use the refreshed credential and need no
+change of their own.
+
 ## Consumers
 
-- **truvity/gitops**: deploys the chart
+- **the maintainers' platform repository**: deploys the chart
 
 ## Neighbours
 
